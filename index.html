@@ -6,10 +6,19 @@
   <title>SoE! Portfolio</title>
   <style>
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-snap-type: y mandatory; background: #000; }
-    body { margin: 0; background: #000; color: #fff; font-family: Arial, Helvetica, sans-serif; overflow-x: hidden; }
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      background: #000;
+    }
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
     a { color: inherit; text-decoration: none; }
-    main { width: 100%; }
 
     .page {
       position: relative;
@@ -30,9 +39,6 @@
       width: 100vw;
       height: 100vh;
       background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
     }
 
@@ -56,11 +62,18 @@
     .page.ended .fallback { opacity: 1; }
     .page.ended .media { opacity: 0; }
 
+    .hotspot-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
     .hotspot {
       position: absolute;
       display: block;
-      z-index: 10;
       background: transparent;
+      pointer-events: auto;
       text-indent: -9999px;
       overflow: hidden;
       cursor: pointer;
@@ -71,49 +84,16 @@
       outline-offset: 2px;
     }
 
-    /* menu positions based on original design */
-    .nav-home      { left:53.3%; top:9.0%; width:5.8%; height:4.8%; }
-    .nav-about     { left:60.2%; top:9.0%; width:6.4%; height:4.8%; }
-    .nav-film      { left:67.9%; top:9.0%; width:5.1%; height:4.8%; }
-    .nav-animation { left:73.9%; top:9.0%; width:10.8%; height:4.8%; }
-    .nav-commercial{ left:85.2%; top:9.0%; width:13.0%; height:4.8%; }
-    .nav-works     { left:98.3%; top:9.0%; width:6.8%; height:4.8%; transform:translateX(-100%); }
-    .nav-contact   { left:100%; top:9.0%; width:8.8%; height:4.8%; transform:translateX(-100%); }
-
-    /* watch film positions */
-    .watch-p03{ left:86.9%; top:53.6%; width:11.8%; height:5.8%; }
-    .watch-p04{ left:76.6%; top:82.3%; width:15.6%; height:6.2%; }
-    .watch-p05{ left:77.2%; top:79.8%; width:15.6%; height:6.2%; }
-    .watch-p06{ left:46.0%; top:79.3%; width:14.0%; height:6.3%; }
-    .watch-p07{ left:46.0%; top:79.3%; width:14.0%; height:6.3%; }
-    .watch-p08{ left:46.0%; top:79.3%; width:14.0%; height:6.3%; }
-    .watch-p09{ left:84.2%; top:83.8%; width:10.2%; height:5.0%; }
-
-    @media (max-width:900px){
-      html{scroll-snap-type:none}
-      .page{
-        height:auto;
-        min-height:auto;
+    @media (max-width: 900px) {
+      html { scroll-snap-type: none; }
+      .page {
+        min-height: auto;
+        height: auto;
       }
-      .frame{
-        width:100vw;
-        height:calc(100vw * 9 / 16);
+      .frame {
+        width: 100vw;
+        height: calc(100vw * 9 / 16);
       }
-      .nav-home      { left:53.0%; top:9.2%; width:6.4%; height:5.2%; }
-      .nav-about     { left:60.1%; top:9.2%; width:7.0%; height:5.2%; }
-      .nav-film      { left:68.0%; top:9.2%; width:5.6%; height:5.2%; }
-      .nav-animation { left:74.0%; top:9.2%; width:11.5%; height:5.2%; }
-      .nav-commercial{ left:85.8%; top:9.2%; width:13.6%; height:5.2%; }
-      .nav-works     { left:98.8%; top:9.2%; width:7.4%; height:5.2%; transform:translateX(-100%); }
-      .nav-contact   { left:100%; top:9.2%; width:9.6%; height:5.2%; transform:translateX(-100%); }
-
-      .watch-p03{ left:86.8%; top:53.0%; width:12.6%; height:6.4%; }
-      .watch-p04{ left:76.2%; top:82.0%; width:16.2%; height:6.6%; }
-      .watch-p05{ left:76.8%; top:79.4%; width:16.2%; height:6.6%; }
-      .watch-p06{ left:45.5%; top:79.0%; width:14.8%; height:6.8%; }
-      .watch-p07{ left:45.5%; top:79.0%; width:14.8%; height:6.8%; }
-      .watch-p08{ left:45.5%; top:79.0%; width:14.8%; height:6.8%; }
-      .watch-p09{ left:83.8%; top:83.4%; width:10.8%; height:5.4%; }
     }
   </style>
 </head>
@@ -153,36 +133,152 @@
       return (window.SOE_CONFIG && window.SOE_CONFIG.links && window.SOE_CONFIG.links[key]) || "https://www.youtube.com/";
     }
 
-    function menuHotspots() {
-      return `
-        <a class="hotspot nav-home" href="#${NAV_TARGET.home}">HOME</a>
-        <a class="hotspot nav-about" href="#${NAV_TARGET.about}">ABOUT</a>
-        <a class="hotspot nav-film" href="#${NAV_TARGET.film}">FILM</a>
-        <a class="hotspot nav-animation" href="#${NAV_TARGET.animation}">ANIMATION</a>
-        <a class="hotspot nav-commercial" href="#${NAV_TARGET.commercial}">COMMERCIAL</a>
-        <a class="hotspot nav-works" href="#${NAV_TARGET.works}">WORKS</a>
-        <a class="hotspot nav-contact" href="#${NAV_TARGET.contact}">CONTACT</a>
-      `;
-    }
+    // 원본 디자인 내부 좌표 (실제 표시되는 영상 영역 기준, %)
+    const NAV_RECTS = {
+      home:       { x: 53.3, y: 9.0, w: 5.8, h: 4.8 },
+      about:      { x: 60.2, y: 9.0, w: 6.4, h: 4.8 },
+      film:       { x: 67.9, y: 9.0, w: 5.1, h: 4.8 },
+      animation:  { x: 73.9, y: 9.0, w: 10.8, h: 4.8 },
+      commercial: { x: 85.2, y: 9.0, w: 13.0, h: 4.8 },
+      works:      { x: 91.2, y: 9.0, w: 6.8, h: 4.8 },
+      contact:    { x: 98.4, y: 9.0, w: 8.8, h: 4.8, alignRight: true }
+    };
 
-    function watchHotspot(page) {
-      if (!page.watch) return "";
-      return `<a class="hotspot watch-p${String(page.num).padStart(2, "0")}" href="${youtubeLink(page.watch)}" target="_blank" rel="noopener noreferrer">WATCH FILM</a>`;
-    }
+    const WATCH_RECTS = {
+      "3": { x: 87.0, y: 53.6, w: 11.8, h: 5.8 },
+      "4": { x: 76.6, y: 82.3, w: 15.6, h: 6.2 },
+      "5": { x: 77.2, y: 79.8, w: 15.6, h: 6.2 },
+      "6": { x: 46.0, y: 79.3, w: 14.0, h: 6.3 },
+      "7": { x: 46.0, y: 79.3, w: 14.0, h: 6.3 },
+      "8": { x: 46.0, y: 79.3, w: 14.0, h: 6.3 },
+      "9": { x: 84.2, y: 83.8, w: 10.2, h: 5.0 }
+    };
 
     const app = document.getElementById("app");
+
     app.innerHTML = PAGES.map(page => `
       <section class="page" id="page-${page.num}">
         <div class="frame">
-          <video class="media" playsinline muted preload="metadata" poster="assets/${page.num}.jpg">
+          <video
+            class="media"
+            playsinline
+            muted
+            preload="metadata"
+            poster="assets/${page.num}.jpg"
+          >
             <source src="assets/${page.num}.mp4" type="video/mp4">
           </video>
-          <img class="fallback" src="assets/${page.num}-end.jpg" alt="" aria-hidden="true">
-          ${menuHotspots()}
-          ${watchHotspot(page)}
+
+          <img
+            class="fallback"
+            src="assets/${page.num}-end.jpg"
+            alt=""
+            aria-hidden="true"
+          >
+
+          <div class="hotspot-layer"></div>
         </div>
       </section>
     `).join("");
+
+    function createHotspot(href, rect, label, newTab = false) {
+      const a = document.createElement("a");
+      a.className = "hotspot";
+      a.href = href;
+      a.textContent = label;
+      if (newTab) {
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+      }
+      a.dataset.x = rect.x;
+      a.dataset.y = rect.y;
+      a.dataset.w = rect.w;
+      a.dataset.h = rect.h;
+      a.dataset.alignRight = rect.alignRight ? "1" : "0";
+      return a;
+    }
+
+    function buildHotspots() {
+      document.querySelectorAll(".page").forEach(pageEl => {
+        const pageNum = pageEl.id.replace("page-", "");
+        const layer = pageEl.querySelector(".hotspot-layer");
+        layer.innerHTML = "";
+
+        layer.appendChild(createHotspot(`#${NAV_TARGET.home}`, NAV_RECTS.home, "HOME"));
+        layer.appendChild(createHotspot(`#${NAV_TARGET.about}`, NAV_RECTS.about, "ABOUT"));
+        layer.appendChild(createHotspot(`#${NAV_TARGET.film}`, NAV_RECTS.film, "FILM"));
+        layer.appendChild(createHotspot(`#${NAV_TARGET.animation}`, NAV_RECTS.animation, "ANIMATION"));
+        layer.appendChild(createHotspot(`#${NAV_TARGET.commercial}`, NAV_RECTS.commercial, "COMMERCIAL"));
+        layer.appendChild(createHotspot(`#${NAV_TARGET.works}`, NAV_RECTS.works, "WORKS"));
+        layer.appendChild(createHotspot(`#${NAV_TARGET.contact}`, NAV_RECTS.contact, "CONTACT"));
+
+        const pageData = PAGES.find(p => p.num === pageNum);
+        if (pageData && pageData.watch && WATCH_RECTS[pageNum]) {
+          layer.appendChild(
+            createHotspot(
+              youtubeLink(pageData.watch),
+              WATCH_RECTS[pageNum],
+              "WATCH FILM",
+              true
+            )
+          );
+        }
+      });
+    }
+
+    function layoutHotspots() {
+      document.querySelectorAll(".page").forEach(pageEl => {
+        const frame = pageEl.querySelector(".frame");
+        const media = pageEl.querySelector(".media");
+        const layer = pageEl.querySelector(".hotspot-layer");
+
+        const fw = frame.clientWidth;
+        const fh = frame.clientHeight;
+
+        // 원본 비율 16:9 기준
+        const mediaRatio = 16 / 9;
+        const frameRatio = fw / fh;
+
+        let rw, rh, rx, ry;
+        if (frameRatio > mediaRatio) {
+          rh = fh;
+          rw = rh * mediaRatio;
+          rx = (fw - rw) / 2;
+          ry = 0;
+        } else {
+          rw = fw;
+          rh = rw / mediaRatio;
+          rx = 0;
+          ry = (fh - rh) / 2;
+        }
+
+        layer.querySelectorAll(".hotspot").forEach(h => {
+          const x = parseFloat(h.dataset.x);
+          const y = parseFloat(h.dataset.y);
+          const w = parseFloat(h.dataset.w);
+          const hgt = parseFloat(h.dataset.h);
+          const alignRight = h.dataset.alignRight === "1";
+
+          const pxW = rw * (w / 100);
+          const pxH = rh * (hgt / 100);
+          let pxX = rx + rw * (x / 100);
+          const pxY = ry + rh * (y / 100);
+
+          if (alignRight) {
+            pxX = rx + rw - pxW;
+          }
+
+          h.style.left = pxX + "px";
+          h.style.top = pxY + "px";
+          h.style.width = pxW + "px";
+          h.style.height = pxH + "px";
+        });
+      });
+    }
+
+    buildHotspots();
+    window.addEventListener("load", layoutHotspots);
+    window.addEventListener("resize", layoutHotspots);
 
     const videos = Array.from(document.querySelectorAll(".media"));
 
@@ -190,7 +286,7 @@
       const page = video.closest(".page");
       if (!page) return;
       page.classList.remove("ended");
-      try { video.currentTime = 0; } catch(e) {}
+      try { video.currentTime = 0; } catch (e) {}
       const p = video.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
     }
@@ -202,12 +298,16 @@
     videos.forEach(video => {
       const page = video.closest(".page");
       if (!page) return;
+
       video.addEventListener("ended", () => {
         page.classList.add("ended");
       });
+
       video.addEventListener("error", () => {
         page.classList.add("ended");
       });
+
+      video.addEventListener("loadedmetadata", layoutHotspots);
     });
 
     const observer = new IntersectionObserver((entries) => {
