@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SoE! Portfolio</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-snap-type: y mandatory; background: #000; }
+    body { margin: 0; background: #000; color: #fff; font-family: Arial, Helvetica, sans-serif; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    main { width: 100%; }
+
+    .page {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 100vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      overflow: hidden;
+    }
+
+    .frame {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .media,
+    .fallback {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      display: block;
+    }
+
+    .fallback {
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .page.ended .fallback { opacity: 1; }
+    .page.ended .media { opacity: 0; }
+
+    .hotspot {
+      position: absolute;
+      display: block;
+      z-index: 10;
+      background: transparent;
+      text-indent: -9999px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .hotspot:focus-visible {
+      outline: 1px solid rgba(255,255,255,.7);
+      outline-offset: 2px;
+    }
+
+    /* menu positions based on original design */
+    .nav-home      { left:53.3%; top:9.0%; width:5.8%; height:4.8%; }
+    .nav-about     { left:60.2%; top:9.0%; width:6.4%; height:4.8%; }
+    .nav-film      { left:67.9%; top:9.0%; width:5.1%; height:4.8%; }
+    .nav-animation { left:73.9%; top:9.0%; width:10.8%; height:4.8%; }
+    .nav-commercial{ left:85.2%; top:9.0%; width:13.0%; height:4.8%; }
+    .nav-works     { left:98.3%; top:9.0%; width:6.8%; height:4.8%; transform:translateX(-100%); }
+    .nav-contact   { left:100%; top:9.0%; width:8.8%; height:4.8%; transform:translateX(-100%); }
+
+    /* watch film positions */
+    .watch-p03{ left:86.9%; top:53.6%; width:11.8%; height:5.8%; }
+    .watch-p04{ left:76.6%; top:82.3%; width:15.6%; height:6.2%; }
+    .watch-p05{ left:77.2%; top:79.8%; width:15.6%; height:6.2%; }
+    .watch-p06{ left:46.0%; top:79.3%; width:14.0%; height:6.3%; }
+    .watch-p07{ left:46.0%; top:79.3%; width:14.0%; height:6.3%; }
+    .watch-p08{ left:46.0%; top:79.3%; width:14.0%; height:6.3%; }
+    .watch-p09{ left:84.2%; top:83.8%; width:10.2%; height:5.0%; }
+
+    @media (max-width:900px){
+      html{scroll-snap-type:none}
+      .page{
+        height:auto;
+        min-height:auto;
+      }
+      .frame{
+        width:100vw;
+        height:calc(100vw * 9 / 16);
+      }
+      .nav-home      { left:53.0%; top:9.2%; width:6.4%; height:5.2%; }
+      .nav-about     { left:60.1%; top:9.2%; width:7.0%; height:5.2%; }
+      .nav-film      { left:68.0%; top:9.2%; width:5.6%; height:5.2%; }
+      .nav-animation { left:74.0%; top:9.2%; width:11.5%; height:5.2%; }
+      .nav-commercial{ left:85.8%; top:9.2%; width:13.6%; height:5.2%; }
+      .nav-works     { left:98.8%; top:9.2%; width:7.4%; height:5.2%; transform:translateX(-100%); }
+      .nav-contact   { left:100%; top:9.2%; width:9.6%; height:5.2%; transform:translateX(-100%); }
+
+      .watch-p03{ left:86.8%; top:53.0%; width:12.6%; height:6.4%; }
+      .watch-p04{ left:76.2%; top:82.0%; width:16.2%; height:6.6%; }
+      .watch-p05{ left:76.8%; top:79.4%; width:16.2%; height:6.6%; }
+      .watch-p06{ left:45.5%; top:79.0%; width:14.8%; height:6.8%; }
+      .watch-p07{ left:45.5%; top:79.0%; width:14.8%; height:6.8%; }
+      .watch-p08{ left:45.5%; top:79.0%; width:14.8%; height:6.8%; }
+      .watch-p09{ left:83.8%; top:83.4%; width:10.8%; height:5.4%; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app"></main>
+
+  <script src="site-config.js"></script>
+  <script>
+    const PAGES = [
+      { num: "1",  category: "home" },
+      { num: "2",  category: "about" },
+      { num: "3",  category: "film",       watch: "film1" },
+      { num: "4",  category: "animation",  watch: "animation1" },
+      { num: "5",  category: "animation",  watch: "animation2" },
+      { num: "6",  category: "commercial", watch: "commercial1" },
+      { num: "7",  category: "commercial", watch: "commercial2" },
+      { num: "8",  category: "commercial", watch: "commercial3" },
+      { num: "9",  category: "works",      watch: "works1" },
+      { num: "10", category: "works" },
+      { num: "11", category: "works" },
+      { num: "12", category: "works" },
+      { num: "13", category: "contact" },
+      { num: "14", category: "contact" }
+    ];
+
+    const NAV_TARGET = {
+      home: "page-1",
+      about: "page-2",
+      film: "page-3",
+      animation: "page-4",
+      commercial: "page-6",
+      works: "page-9",
+      contact: "page-13"
+    };
+
+    function youtubeLink(key) {
+      return (window.SOE_CONFIG && window.SOE_CONFIG.links && window.SOE_CONFIG.links[key]) || "https://www.youtube.com/";
+    }
+
+    function menuHotspots() {
+      return `
+        <a class="hotspot nav-home" href="#${NAV_TARGET.home}">HOME</a>
+        <a class="hotspot nav-about" href="#${NAV_TARGET.about}">ABOUT</a>
+        <a class="hotspot nav-film" href="#${NAV_TARGET.film}">FILM</a>
+        <a class="hotspot nav-animation" href="#${NAV_TARGET.animation}">ANIMATION</a>
+        <a class="hotspot nav-commercial" href="#${NAV_TARGET.commercial}">COMMERCIAL</a>
+        <a class="hotspot nav-works" href="#${NAV_TARGET.works}">WORKS</a>
+        <a class="hotspot nav-contact" href="#${NAV_TARGET.contact}">CONTACT</a>
+      `;
+    }
+
+    function watchHotspot(page) {
+      if (!page.watch) return "";
+      return `<a class="hotspot watch-p${String(page.num).padStart(2, "0")}" href="${youtubeLink(page.watch)}" target="_blank" rel="noopener noreferrer">WATCH FILM</a>`;
+    }
+
+    const app = document.getElementById("app");
+    app.innerHTML = PAGES.map(page => `
+      <section class="page" id="page-${page.num}">
+        <div class="frame">
+          <video class="media" playsinline muted preload="metadata" poster="assets/${page.num}.jpg">
+            <source src="assets/${page.num}.mp4" type="video/mp4">
+          </video>
+          <img class="fallback" src="assets/${page.num}-end.jpg" alt="" aria-hidden="true">
+          ${menuHotspots()}
+          ${watchHotspot(page)}
+        </div>
+      </section>
+    `).join("");
+
+    const videos = Array.from(document.querySelectorAll(".media"));
+
+    function resetAndPlay(video) {
+      const page = video.closest(".page");
+      if (!page) return;
+      page.classList.remove("ended");
+      try { video.currentTime = 0; } catch(e) {}
+      const p = video.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    }
+
+    function stopVideo(video) {
+      video.pause();
+    }
+
+    videos.forEach(video => {
+      const page = video.closest(".page");
+      if (!page) return;
+      video.addEventListener("ended", () => {
+        page.classList.add("ended");
+      });
+      video.addEventListener("error", () => {
+        page.classList.add("ended");
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          resetAndPlay(video);
+        } else {
+          stopVideo(video);
+        }
+      });
+    }, { threshold: 0.65 });
+
+    videos.forEach(video => observer.observe(video));
+  </script>
+</body>
+</html>
