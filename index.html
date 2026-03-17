@@ -103,48 +103,169 @@
   <script src="site-config.js"></script>
   <script>
     const PAGES = [
-      { num: "1",  category: "home" },
-      { num: "2",  category: "about" },
-      { num: "3",  category: "film",       watch: "film1" },
-      { num: "4",  category: "animation",  watch: "animation1" },
-      { num: "5",  category: "animation",  watch: "animation2" },
-      { num: "6",  category: "commercial", watch: "commercial1" },
-      { num: "7",  category: "commercial", watch: "commercial2" },
-      { num: "8",  category: "commercial", watch: "commercial3" },
-      { num: "9",  category: "works",      watch: "works1" },
-      { num: "10", category: "works" },
-      { num: "11", category: "works" },
-      { num: "12", category: "works" },
-      { num: "13", category: "contact" },
-      { num: "14", category: "contact" }
+      { num: "1" },
+      { num: "2" },
+      { num: "3",  watch: "film1" },
+      { num: "4",  watch: "animation1" },
+      { num: "5",  watch: "animation2" },
+      { num: "6",  watch: "commercial1" },
+      { num: "7",  watch: "commercial2" },
+      { num: "8",  watch: "commercial3" },
+      { num: "9",  watch: "works1" },
+      { num: "10" },
+      { num: "11" },
+      { num: "12" },
+      { num: "13" },
+      { num: "14" }
     ];
 
-    const NAV_TARGET = {
-      home: "page-1",
-      about: "page-2",
-      film: "page-3",
-      animation: "page-4",
-      commercial: "page-6",
-      works: "page-9",
-      contact: "page-13"
+    // 네가 지정한 고정 이동
+    const TARGETS = {
+      home: "#page-1",
+      about: "#page-2",
+      film: "#page-3",
+      animation: "#page-4",
+      commercial: "#page-6",
+      works: "#page-9",
+      contact: "#page-13"
     };
 
     function youtubeLink(key) {
       return (window.SOE_CONFIG && window.SOE_CONFIG.links && window.SOE_CONFIG.links[key]) || "https://www.youtube.com/";
     }
 
-    // 원본 디자인 내부 좌표 (실제 표시되는 영상 영역 기준, %)
-    const NAV_RECTS = {
-      home:       { x: 53.3, y: 9.0, w: 5.8, h: 4.8 },
-      about:      { x: 60.2, y: 9.0, w: 6.4, h: 4.8 },
-      film:       { x: 67.9, y: 9.0, w: 5.1, h: 4.8 },
-      animation:  { x: 73.9, y: 9.0, w: 10.8, h: 4.8 },
-      commercial: { x: 85.2, y: 9.0, w: 13.0, h: 4.8 },
-      works:      { x: 91.2, y: 9.0, w: 6.8, h: 4.8 },
-      contact:    { x: 98.4, y: 9.0, w: 8.8, h: 4.8, alignRight: true }
+    // 페이지별 메뉴 좌표
+    // x,y,w,h = 실제 표시되는 영상영역(16:9 contain 박스) 기준 %
+    const PAGE_MENU_RECTS = {
+      "1": {
+        home:{x:53.3,y:9.0,w:5.8,h:4.8},
+        about:{x:60.2,y:9.0,w:6.4,h:4.8},
+        film:{x:67.9,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.9,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.2,y:9.0,w:13.0,h:4.8},
+        works:{x:91.2,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.4,y:9.0,w:8.8,h:4.8,alignRight:true}
+      },
+      "2": {
+        home:{x:53.1,y:9.0,w:5.8,h:4.8},
+        about:{x:60.0,y:9.0,w:6.4,h:4.8},
+        film:{x:67.7,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.7,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.0,y:9.0,w:13.0,h:4.8},
+        works:{x:91.0,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.3,y:9.0,w:8.8,h:4.8,alignRight:true}
+      },
+      "3": {
+        home:{x:53.6,y:9.1,w:5.8,h:4.8},
+        about:{x:60.4,y:9.1,w:6.4,h:4.8},
+        film:{x:68.1,y:9.1,w:5.1,h:4.8},
+        animation:{x:74.1,y:9.1,w:10.8,h:4.8},
+        commercial:{x:85.4,y:9.1,w:13.0,h:4.8},
+        works:{x:91.5,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.6,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "4": {
+        home:{x:52.9,y:9.1,w:5.8,h:4.8},
+        about:{x:59.8,y:9.1,w:6.4,h:4.8},
+        film:{x:67.5,y:9.1,w:5.1,h:4.8},
+        animation:{x:73.5,y:9.1,w:10.8,h:4.8},
+        commercial:{x:84.8,y:9.1,w:13.0,h:4.8},
+        works:{x:90.9,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.0,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "5": {
+        home:{x:53.0,y:9.1,w:5.8,h:4.8},
+        about:{x:59.9,y:9.1,w:6.4,h:4.8},
+        film:{x:67.6,y:9.1,w:5.1,h:4.8},
+        animation:{x:73.6,y:9.1,w:10.8,h:4.8},
+        commercial:{x:84.9,y:9.1,w:13.0,h:4.8},
+        works:{x:91.0,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.1,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "6": {
+        home:{x:53.4,y:9.0,w:5.8,h:4.8},
+        about:{x:60.2,y:9.0,w:6.4,h:4.8},
+        film:{x:67.9,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.9,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.2,y:9.0,w:13.0,h:4.8},
+        works:{x:91.3,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.4,y:9.0,w:8.8,h:4.8,alignRight:true}
+      },
+      "7": {
+        home:{x:53.4,y:9.0,w:5.8,h:4.8},
+        about:{x:60.2,y:9.0,w:6.4,h:4.8},
+        film:{x:67.9,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.9,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.2,y:9.0,w:13.0,h:4.8},
+        works:{x:91.3,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.4,y:9.0,w:8.8,h:4.8,alignRight:true}
+      },
+      "8": {
+        home:{x:53.4,y:9.0,w:5.8,h:4.8},
+        about:{x:60.2,y:9.0,w:6.4,h:4.8},
+        film:{x:67.9,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.9,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.2,y:9.0,w:13.0,h:4.8},
+        works:{x:91.3,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.4,y:9.0,w:8.8,h:4.8,alignRight:true}
+      },
+      "9": {
+        home:{x:53.0,y:9.1,w:5.8,h:4.8},
+        about:{x:59.8,y:9.1,w:6.4,h:4.8},
+        film:{x:67.5,y:9.1,w:5.1,h:4.8},
+        animation:{x:73.5,y:9.1,w:10.8,h:4.8},
+        commercial:{x:84.8,y:9.1,w:13.0,h:4.8},
+        works:{x:90.9,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.0,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "10": {
+        home:{x:53.0,y:9.1,w:5.8,h:4.8},
+        about:{x:59.8,y:9.1,w:6.4,h:4.8},
+        film:{x:67.5,y:9.1,w:5.1,h:4.8},
+        animation:{x:73.5,y:9.1,w:10.8,h:4.8},
+        commercial:{x:84.8,y:9.1,w:13.0,h:4.8},
+        works:{x:90.9,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.0,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "11": {
+        home:{x:53.0,y:9.1,w:5.8,h:4.8},
+        about:{x:59.8,y:9.1,w:6.4,h:4.8},
+        film:{x:67.5,y:9.1,w:5.1,h:4.8},
+        animation:{x:73.5,y:9.1,w:10.8,h:4.8},
+        commercial:{x:84.8,y:9.1,w:13.0,h:4.8},
+        works:{x:90.9,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.0,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "12": {
+        home:{x:53.0,y:9.1,w:5.8,h:4.8},
+        about:{x:59.8,y:9.1,w:6.4,h:4.8},
+        film:{x:67.5,y:9.1,w:5.1,h:4.8},
+        animation:{x:73.5,y:9.1,w:10.8,h:4.8},
+        commercial:{x:84.8,y:9.1,w:13.0,h:4.8},
+        works:{x:90.9,y:9.1,w:6.8,h:4.8},
+        contact:{x:98.0,y:9.1,w:8.8,h:4.8,alignRight:true}
+      },
+      "13": {
+        home:{x:53.2,y:9.0,w:5.8,h:4.8},
+        about:{x:60.0,y:9.0,w:6.4,h:4.8},
+        film:{x:67.7,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.7,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.0,y:9.0,w:13.0,h:4.8},
+        works:{x:91.1,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.2,y:9.0,w:8.8,h:4.8,alignRight:true}
+      },
+      "14": {
+        home:{x:53.2,y:9.0,w:5.8,h:4.8},
+        about:{x:60.0,y:9.0,w:6.4,h:4.8},
+        film:{x:67.7,y:9.0,w:5.1,h:4.8},
+        animation:{x:73.7,y:9.0,w:10.8,h:4.8},
+        commercial:{x:85.0,y:9.0,w:13.0,h:4.8},
+        works:{x:91.1,y:9.0,w:6.8,h:4.8},
+        contact:{x:98.2,y:9.0,w:8.8,h:4.8,alignRight:true}
+      }
     };
 
-    const WATCH_RECTS = {
+    const PAGE_WATCH_RECTS = {
       "3": { x: 87.0, y: 53.6, w: 11.8, h: 5.8 },
       "4": { x: 76.6, y: 82.3, w: 15.6, h: 6.2 },
       "5": { x: 77.2, y: 79.8, w: 15.6, h: 6.2 },
@@ -154,28 +275,19 @@
       "9": { x: 84.2, y: 83.8, w: 10.2, h: 5.0 }
     };
 
+    function youtubeLink(key) {
+      return (window.SOE_CONFIG && window.SOE_CONFIG.links && window.SOE_CONFIG.links[key]) || "https://www.youtube.com/";
+    }
+
     const app = document.getElementById("app");
 
     app.innerHTML = PAGES.map(page => `
       <section class="page" id="page-${page.num}">
         <div class="frame">
-          <video
-            class="media"
-            playsinline
-            muted
-            preload="metadata"
-            poster="assets/${page.num}.jpg"
-          >
+          <video class="media" playsinline muted preload="metadata" poster="assets/${page.num}.jpg">
             <source src="assets/${page.num}.mp4" type="video/mp4">
           </video>
-
-          <img
-            class="fallback"
-            src="assets/${page.num}-end.jpg"
-            alt=""
-            aria-hidden="true"
-          >
-
+          <img class="fallback" src="assets/${page.num}-end.jpg" alt="" aria-hidden="true">
           <div class="hotspot-layer"></div>
         </div>
       </section>
@@ -200,24 +312,25 @@
 
     function buildHotspots() {
       document.querySelectorAll(".page").forEach(pageEl => {
-        const pageNum = pageEl.id.replace("page-", "");
+        const num = pageEl.id.replace("page-", "");
         const layer = pageEl.querySelector(".hotspot-layer");
         layer.innerHTML = "";
 
-        layer.appendChild(createHotspot(`#${NAV_TARGET.home}`, NAV_RECTS.home, "HOME"));
-        layer.appendChild(createHotspot(`#${NAV_TARGET.about}`, NAV_RECTS.about, "ABOUT"));
-        layer.appendChild(createHotspot(`#${NAV_TARGET.film}`, NAV_RECTS.film, "FILM"));
-        layer.appendChild(createHotspot(`#${NAV_TARGET.animation}`, NAV_RECTS.animation, "ANIMATION"));
-        layer.appendChild(createHotspot(`#${NAV_TARGET.commercial}`, NAV_RECTS.commercial, "COMMERCIAL"));
-        layer.appendChild(createHotspot(`#${NAV_TARGET.works}`, NAV_RECTS.works, "WORKS"));
-        layer.appendChild(createHotspot(`#${NAV_TARGET.contact}`, NAV_RECTS.contact, "CONTACT"));
+        const menu = PAGE_MENU_RECTS[num];
+        layer.appendChild(createHotspot(TARGETS.home, menu.home, "HOME"));
+        layer.appendChild(createHotspot(TARGETS.about, menu.about, "ABOUT"));
+        layer.appendChild(createHotspot(TARGETS.film, menu.film, "FILM"));
+        layer.appendChild(createHotspot(TARGETS.animation, menu.animation, "ANIMATION"));
+        layer.appendChild(createHotspot(TARGETS.commercial, menu.commercial, "COMMERCIAL"));
+        layer.appendChild(createHotspot(TARGETS.works, menu.works, "WORKS"));
+        layer.appendChild(createHotspot(TARGETS.contact, menu.contact, "CONTACT"));
 
-        const pageData = PAGES.find(p => p.num === pageNum);
-        if (pageData && pageData.watch && WATCH_RECTS[pageNum]) {
+        const pageData = PAGES.find(p => p.num === num);
+        if (pageData && pageData.watch && PAGE_WATCH_RECTS[num]) {
           layer.appendChild(
             createHotspot(
               youtubeLink(pageData.watch),
-              WATCH_RECTS[pageNum],
+              PAGE_WATCH_RECTS[num],
               "WATCH FILM",
               true
             )
@@ -229,13 +342,10 @@
     function layoutHotspots() {
       document.querySelectorAll(".page").forEach(pageEl => {
         const frame = pageEl.querySelector(".frame");
-        const media = pageEl.querySelector(".media");
         const layer = pageEl.querySelector(".hotspot-layer");
 
         const fw = frame.clientWidth;
         const fh = frame.clientHeight;
-
-        // 원본 비율 16:9 기준
         const mediaRatio = 16 / 9;
         const frameRatio = fw / fh;
 
@@ -252,15 +362,15 @@
           ry = (fh - rh) / 2;
         }
 
-        layer.querySelectorAll(".hotspot").forEach(h => {
-          const x = parseFloat(h.dataset.x);
-          const y = parseFloat(h.dataset.y);
-          const w = parseFloat(h.dataset.w);
-          const hgt = parseFloat(h.dataset.h);
-          const alignRight = h.dataset.alignRight === "1";
+        layer.querySelectorAll(".hotspot").forEach(el => {
+          const x = parseFloat(el.dataset.x);
+          const y = parseFloat(el.dataset.y);
+          const w = parseFloat(el.dataset.w);
+          const h = parseFloat(el.dataset.h);
+          const alignRight = el.dataset.alignRight === "1";
 
           const pxW = rw * (w / 100);
-          const pxH = rh * (hgt / 100);
+          const pxH = rh * (h / 100);
           let pxX = rx + rw * (x / 100);
           const pxY = ry + rh * (y / 100);
 
@@ -268,10 +378,10 @@
             pxX = rx + rw - pxW;
           }
 
-          h.style.left = pxX + "px";
-          h.style.top = pxY + "px";
-          h.style.width = pxW + "px";
-          h.style.height = pxH + "px";
+          el.style.left = pxX + "px";
+          el.style.top = pxY + "px";
+          el.style.width = pxW + "px";
+          el.style.height = pxH + "px";
         });
       });
     }
@@ -286,7 +396,7 @@
       const page = video.closest(".page");
       if (!page) return;
       page.classList.remove("ended");
-      try { video.currentTime = 0; } catch (e) {}
+      try { video.currentTime = 0; } catch(e) {}
       const p = video.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
     }
